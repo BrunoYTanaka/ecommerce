@@ -312,7 +312,7 @@ $app->get("/admin/categories/:idcategory/delete",function($idcategory){
 });
 
 
-/*Editar categoria*/
+/*Editar categoria via get*/
 $app->get("/admin/categories/:idcategory",function ($idcategory){
 
 	User::verifyLogin();
@@ -331,6 +331,7 @@ $app->get("/admin/categories/:idcategory",function ($idcategory){
 
 });
 
+/*Editar categoria via post*/
 $app->post("/admin/categories/:idcategory",function ($idcategory){
 
 	User::verifyLogin();
@@ -350,7 +351,22 @@ $app->post("/admin/categories/:idcategory",function ($idcategory){
 
 });
 
+/*Listar as categorias no html de forma dinâmica*/
+$app->get("/categories/:idcategory",function($idcategory){
 
+	$category = new Category();
+
+	$category->get((int)$idcategory);
+
+	$page = new Page();
+
+	$page->setTpl("category",array(
+		"category"=>$category->getValues(),
+		"products" => []
+	));
+
+
+});
 
 
 $app->run();
