@@ -17,6 +17,21 @@ class Products extends Model{
 
 	}
 
+	public static function checkList($list){
+
+		foreach ($list as &$row ) {
+			
+			$p = new Products();
+			$p->setData($row);
+			$row = $p->getValues();
+
+		}
+
+		return $list;
+
+	}
+
+
 	public function save(){
 
 		$sql = new Sql();
@@ -57,31 +72,29 @@ class Products extends Model{
 		));
 	}
 
-	public function checkPhoto(){
 
-		/*Verifica se a imagem existe*/
-		if(file_exists(
+	public function checkPhoto()
+	{
 
-			$_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . 
-			"res" . DIRECTORY_SEPARATOR .
+		if (file_exists(
+			$_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 
+			"res" . DIRECTORY_SEPARATOR . 
 			"site" . DIRECTORY_SEPARATOR . 
 			"img" . DIRECTORY_SEPARATOR . 
 			"products" . DIRECTORY_SEPARATOR . 
-			$this->getidproduct() . ".jpg")){
+			$this->getidproduct() . ".jpg"
+			)) 
+		{
 
-			/*Se existir retorna a URL da imagem*/
 			$url = "/res/site/img/products/" . $this->getidproduct() . ".jpg";
 
-		}else{
+		}else {
 
-			/*Se não existir retorna uma imagem padrão*/
 			$url = "/res/site/img/product.jpg";
 		}
 
 		return $this->setdesphoto($url);
-
 	}
-
 
 	public function getValues(){
 
@@ -92,33 +105,34 @@ class Products extends Model{
 		return $values;
 	}
 
-	public function setPhoto($file){
+public function setPhoto($file){
 
-		$extension = explode(".", $file["name"]);
+		$extension = explode('.', $file['name']);
 
 		$extension = end($extension);
 
 		switch ($extension) {
-			case 'jpg':	
-			case 'jpeg':
-				$image = imagecreatefromjpeg($file["tmp_name"]);
+			case "jpg":
+
+			case "jpeg":
+			$image = imagecreatefromjpeg($file["tmp_name"]);
 			break;
 
-			case 'gif':
-				$image = imagecreatefromgif($file["tmp_name"]);
+			case "gif":
+			$image = imagecreatefromgif($file["tmp_name"]);
 			break;
 
-			case 'png':
-				$image = imagecreatefrompng($file["tmp_name"]);
+			case "png":
+			$image = imagecreatefrompng($file["tmp_name"]);
 			break;
 
 		}
 
-		$dist = $_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . 
-			"res" . DIRECTORY_SEPARATOR .
+		$dist = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 
+			"res" . DIRECTORY_SEPARATOR . 
 			"site" . DIRECTORY_SEPARATOR . 
 			"img" . DIRECTORY_SEPARATOR . 
-			"products" . DIRECTORY_SEPARATOR .
+			"products" . DIRECTORY_SEPARATOR . 
 			$this->getidproduct() . ".jpg";
 
 		imagejpeg($image, $dist);
@@ -126,7 +140,6 @@ class Products extends Model{
 		imagedestroy($image);
 
 		$this->checkPhoto();
-
 	}
 
 }
