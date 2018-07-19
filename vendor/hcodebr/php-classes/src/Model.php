@@ -23,10 +23,6 @@ class Model{
 				$this->values[$fieldName] = $args[0];
 			break;
 
-
-			default:
-				# code...
-			break;
 		}
 
 	}
