@@ -85,6 +85,8 @@ class User extends Model{
 
 			$user = new User();
 
+			$data['desperson'] = utf8_encode($data['desperson']);
+
 			$user->setData($data);
 
 			$_SESSION[User::SESSION] = $user->getValues();
@@ -166,34 +168,27 @@ class User extends Model{
 		$data = $results[0];
 
 		$data['desperson'] = utf8_encode($data['desperson']);
-		
+
 		$this->setData($data);
 	}
 
 
-	public function save(){
+	public function save(){	
 
 		$sql = new Sql();
 
-		/*
-		pdesperson VARCHAR(64), 
-		pdeslogin VARCHAR(64), 
-		pdespassword VARCHAR(256), 
-		pdesemail VARCHAR(128), 
-		pnrphone BIGINT, 
-		pinadmin TINYINT	
-		*/
+		$results = $sql->select("CALL sp_users_save(:desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)", array(
 
-		$results = $sql->select("CALL sp_users_save( :desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)",array(
-			":desperson"=>$this->getdesperson(),
+			":desperson"=>utf8_decode($this->getdesperson()),
 			":deslogin"=>$this->getdeslogin(),
-			":despassword"=>$this->getdespassword(),
+			":despassword"=>User::getPasswordHash($this->getdespassword()),
 			":desemail"=>$this->getdesemail(),
 			":nrphone"=>$this->getnrphone(),
 			":inadmin"=>$this->getinadmin()
 		));
 
 		$this->setData($results[0]);
+		
 	}
 
 
@@ -212,9 +207,9 @@ class User extends Model{
 
 		$results = $sql->select("CALL sp_usersupdate_save(:iduser, :desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)",array(
 			":iduser"=>$this->getiduser(),
-			":desperson"=>$this->getdesperson(),
+			":desperson"=>utf8_decode($this->getdesperson()),
 			":deslogin"=>$this->getdeslogin(),
-			":despassword"=>$this->getdespassword(),
+			":despassword"=>User::getPasswordHash($this->getdespassword()),
 			":desemail"=>$this->getdesemail(),
 			":nrphone"=>$this->getnrphone(),
 			":inadmin"=>$this->getinadmin()
@@ -335,6 +330,13 @@ class User extends Model{
 			":password"=>$password,
 			":iduser"=>$this->getiduser()
 		));
+	}
+
+	public static function getPasswordHash($password){
+
+		return password_hash($password, PASSWORD_DEFAULT, ['cost' => 12]);
+
+
 	}
 
 
