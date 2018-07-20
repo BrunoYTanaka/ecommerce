@@ -80,7 +80,7 @@
                         <div class="cart-collaterals">
 
                             <div class="cross-sells">
-
+                                
                                 <h2>Cálculo de Frete</h2>
 
                                 <div class="coupon">

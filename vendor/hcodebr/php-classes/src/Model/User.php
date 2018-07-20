@@ -1,7 +1,5 @@
 <?php 
 
-
-
 namespace Hcode\Model;
 
 use	\Hcode\DB\Sql;
@@ -12,20 +10,30 @@ class User extends Model{
 
 	const SESSION = "User";
 	const SECRET = "HcodePhp7_Secret";
+	const ERROR = "UserError";
+	const ERROR_REGISTER = "UserErrorRegister";
 
 	public static function getFromSession(){
 
 		$user = new User();
 
-		if(isset($_SESSION[User::SESSION]) && (int)$_SESSION[User::SESSION]["iduser"] > 0){
+		if (isset($_SESSION[User::SESSION]) && (int)$_SESSION[User::SESSION]['iduser'] > 0) {
 
 			$user->setData($_SESSION[User::SESSION]);
+
 		}
+
 		return $user;
 	}
-
 	public static function checkLogin($inadmin = true)
 	{
+		/*Verifica se:
+		a sessão do usuário não está definida
+		ou
+		a sessão está definida, mas está vazia
+		ou
+		a sessão está definida e não é vazia, mas o iduser não for maior que zero */
+
 		if (
 			!isset($_SESSION[User::SESSION])
 			||
@@ -38,10 +46,12 @@ class User extends Model{
 
 		} else {
 
+			/*Verifica se o usuário é admin e a sessão a rota é administrativa*/
 			if ($inadmin === true && (bool)$_SESSION[User::SESSION]['inadmin'] === true) {
 
 				return true;
 
+				/*A rota não é admin*/
 			} else if ($inadmin === false) {
 
 				return true;
@@ -106,10 +116,33 @@ class User extends Model{
 		}
 	}
 
+	public static function setError($msg){
+
+		$_SESSION[User::ERROR] = $msg;
+
+	}
+
+	public static function getError(){
+
+		$msg = (isset($_SESSION[User::ERROR]) && $_SESSION[User::ERROR]) ? $_SESSION[User::ERROR] : "";
+
+		User::clearError();
+
+		return $msg;
+
+	}
+
+	public static function clearError(){
+
+		$_SESSION[User::ERROR] = NULL;
+
+	}
+
+
 
 	public static function logout(){
 
-		$_SESSION[User::SESSION] = NULL;
+		$_SESSION[User::ERROR] = NULL;
 
 	}
 
@@ -121,20 +154,22 @@ class User extends Model{
 
 	}
 
-	public function get($iduser)
-	{
+
+	public function get($iduser){
 
 		$sql = new Sql();
 
-		$results = $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) WHERE a.iduser = :iduser;", array(
+		$results = $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) WHERE a.iduser = :iduser", array(
 			":iduser"=>$iduser
 		));
 
 		$data = $results[0];
 
+		$data['desperson'] = utf8_encode($data['desperson']);
+		
 		$this->setData($data);
-
 	}
+
 
 	public function save(){
 
