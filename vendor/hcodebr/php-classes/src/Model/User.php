@@ -70,8 +70,8 @@ class User extends Model{
 
 		$sql = new Sql();
 
-		$results = $sql->select("SELECT * FROM tb_users WHERE deslogin = :LOGIN",array(
-			":LOGIN" => $login
+		$results = $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b ON a.idperson = b.idperson WHERE a.deslogin = :LOGIN", array(
+			":LOGIN"=>$login
 		));
 
 		if(count($results) === 0){
@@ -144,7 +144,7 @@ class User extends Model{
 
 	public static function logout(){
 
-		$_SESSION[User::ERROR] = NULL;
+		$_SESSION[User::SESSION] = NULL;
 
 	}
 
@@ -338,6 +338,42 @@ class User extends Model{
 
 
 	}
+
+	public static function setErrorRegister($msg){
+
+		$_SESSION[User::ERROR_REGISTER] = $msg;
+
+	}
+
+	public static function getErrorREgister(){
+
+		$msg = (isset($_SESSION[User::ERROR_REGISTER]) && $_SESSION[User::ERROR_REGISTER]) ? $_SESSION[User::ERROR_REGISTER] : "";
+
+		User::clearErrorRegister();
+
+		return $msg;
+
+	}
+
+	public static function clearErrorRegister(){
+
+		$_SESSION[User::ERROR_REGISTER] = NULL;
+
+	}
+
+	public static function checkLoginExist($login){
+
+
+		$sql = new Sql();
+
+		$results = $sql->select("SELECT * FROM tb_users WHERE deslogin = :deslogin", array(":deslogin" => $login));
+
+		return (count($results) > 0);
+
+	}
+
+
+
 
 
 
